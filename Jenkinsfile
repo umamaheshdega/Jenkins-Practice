@@ -1,88 +1,103 @@
 pipeline {
-    agent { label 'Devops' }
-
-    environment {
-        PROJECT   = 'expense'
-        COMPONENT = 'backend'
+    agent { label 'AGENT-1' }
+    environment { 
+        PROJECT = 'EXPENSE'
+        COMPONENT = 'BACKEND' 
         DEPLOY_TO = "production"
     }
-
     options {
         disableConcurrentBuilds()
-        timeout(time: 10, unit: 'SECONDS')
+        timeout(time: 30, unit: 'MINUTES')
     }
-
-    parameters {
+    parameters{
         string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
         text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
         booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
         choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
         password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
     }
-
     stages {
         stage('Build') {
             steps {
-                sh """
-                echo "hello this is build"
-                echo "project: $PROJECT"
-                echo "Hello ${params.PERSON}"
-                echo "Biography: ${params.BIOGRAPHY}"
-                echo "Toggle: ${params.TOGGLE}"
-                echo "Choice: ${params.CHOICE}"
-                echo "Password: ${params.PASSWORD}"
-                """
+               script{
+                 sh """
+                    echo "Hello, this is build"
+                    echo "Project: $PROJECT"
+                    echo "Hello ${params.PERSON}"
+                    echo "Biography: ${params.BIOGRAPHY}"
+                    echo "Toggle: ${params.TOGGLE}"
+                    echo "Choice: ${params.CHOICE}"
+                    echo "Password: ${params.PASSWORD}"
+                 """
+               }
             }
         }
-
         stage('Test') {
             steps {
-                sh 'echo "Hello this is test"'
+                script{
+                 sh """
+                    echo "Hello, this is test"
+                 """
+                }
             }
         }
-
         stage('Deploy') {
-            when {
+            /* input {
+                message "Should we continue?"
+                ok "Yes, we should."
+                submitter "alice,bob"
+                parameters {
+                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+                }
+            } */
+            when { 
                 environment name: 'DEPLOY_TO', value: 'production'
             }
             steps {
-                sh 'echo "Hello this is Deploy"'
+                script{
+                 sh """
+                    echo "Hello, this is deploy"
+                 """
+                }
             }
         }
-
         stage('Parallel Stages') {
             parallel {
                 stage('STAGE-1') {
+                    
                     steps {
-                        sh """
-                        echo "Hello this is parallel stage-1"
-                        sleep 15
-                        """
+                        script{
+                            sh """
+                                echo "Hello, this is STAGE-1"
+                                sleep 15
+                            """
+                        }
                     }
                 }
                 stage('STAGE-2') {
+                    
                     steps {
-                        sh 'echo "Hello this is parallel stage-2"'
-                    }
-                }
-                stage('STAGE-3') {
-                    steps {
-                        sh 'echo "Hello this is parallel stage-3"'
+                        script{
+                            sh """
+                                echo "Hello, this is STAGE-2"
+                                sleep 15
+                            """
+                        }
                     }
                 }
             }
         }
     }
-
-    post {
-        always {
-            echo 'I will always say hello'
+    post { 
+        always { 
+            echo 'I will always say Hello again!'
+            deleteDir()
         }
-        failure {
-            echo 'I will run when pipeline fails'
+        failure { 
+            echo 'I will run when pipeline is failed'
         }
-        success {
-            echo 'I will run when pipeline succeeds'
+        success { 
+            echo 'I will run when pipeline is success'
         }
     }
 }
