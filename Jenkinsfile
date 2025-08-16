@@ -2,14 +2,14 @@ pipeline {
     agent { label 'Devops' }
 
     environment {
-        PROJECT = 'expense'
+        PROJECT   = 'expense'
         COMPONENT = 'backend'
         DEPLOY_TO = "production"
     }
 
     options {
         disableConcurrentBuilds()
-        timeout(time: 30, unit: 'MINUTES')
+        timeout(time: 10, unit: 'SECONDS')
     }
 
     parameters {
@@ -35,15 +35,9 @@ pipeline {
             }
         }
 
-        stage('Unit Test') {
+        stage('Test') {
             steps {
-                sh "echo 'Hello this is unit test'"
-            }
-        }
-
-        stage('Integration Test') {
-            steps {
-                sh "echo 'Hello this is integration test'"
+                sh 'echo "Hello this is test"'
             }
         }
 
@@ -52,7 +46,7 @@ pipeline {
                 environment name: 'DEPLOY_TO', value: 'production'
             }
             steps {
-                sh "echo 'Hello this is Deploy'"
+                sh 'echo "Hello this is Deploy"'
             }
         }
 
@@ -60,17 +54,20 @@ pipeline {
             parallel {
                 stage('STAGE-1') {
                     steps {
-                        sh "echo 'Hello this is parallel stage-1'; sleep 15"
+                        sh """
+                        echo "Hello this is parallel stage-1"
+                        sleep 15
+                        """
                     }
                 }
                 stage('STAGE-2') {
                     steps {
-                        sh "echo 'Hello this is parallel stage-2'"
+                        sh 'echo "Hello this is parallel stage-2"'
                     }
                 }
                 stage('STAGE-3') {
                     steps {
-                        sh "echo 'Hello this is parallel stage-3'"
+                        sh 'echo "Hello this is parallel stage-3"'
                     }
                 }
             }
